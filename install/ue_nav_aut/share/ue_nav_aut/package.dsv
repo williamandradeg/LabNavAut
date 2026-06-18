@@ -1,0 +1,6 @@
+source;share/ue_nav_aut/hook/cmake_prefix_path.dsv
+source;share/ue_nav_aut/hook/cmake_prefix_path.sh
+source;share/ue_nav_aut/local_setup.bash
+source;share/ue_nav_aut/local_setup.dsv
+source;share/ue_nav_aut/local_setup.sh
+source;share/ue_nav_aut/local_setup.zsh
