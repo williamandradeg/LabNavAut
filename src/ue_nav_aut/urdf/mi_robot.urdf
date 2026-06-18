@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<robot name="mi_robot">
+
+  <!-- ========================================== -->
+  <!--                MATERIALES                  -->
+  <!-- ========================================== -->
+  <material name="azul"><color rgba="0.0 0.0 0.8 1.0"/></material>
+  <material name="negro"><color rgba="0.0 0.0 0.0 1.0"/></material>
+  <material name="rojo"><color rgba="0.8 0.0 0.0 1.0"/></material>
+
+  <!-- ========================================== -->
+  <!--             ESLABONES (LINKS)              -->
+  <!-- ========================================== -->
+
+  <!-- Base footprint: Proyección en el suelo (Origen de coordenadas) -->
+  <link name="base_footprint"/>
+
+  <!-- Chasis principal -->
+  <link name="base_link">
+    <inertial>
+      <mass value="5.0"/>
+      <origin xyz="0 0 0.1"/>
+      <inertia ixx="0.05" ixy="0.0" ixz="0.0" iyy="0.05" iyz="0.0" izz="0.08"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0.1"/>
+      <geometry><cylinder radius="0.2" length="0.2"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0.1"/>
+      <geometry><cylinder radius="0.2" length="0.2"/></geometry>
+      <material name="azul"/>
+    </visual>
+  </link>
+
+  <!-- Rueda Izquierda -->
+  <link name="rueda_izquierda">
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <geometry><cylinder radius="0.06" length="0.04"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <geometry><cylinder radius="0.06" length="0.04"/></geometry>
+      <material name="negro"/>
+    </visual>
+  </link>
+
+  <!-- Rueda Derecha -->
+  <link name="rueda_derecha">
+    <inertial>
+      <mass value="0.5"/>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <geometry><cylinder radius="0.06" length="0.04"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5707 0 0"/>
+      <geometry><cylinder radius="0.06" length="0.04"/></geometry>
+      <material name="negro"/>
+    </visual>
+  </link>
+
+  <!-- Rueda Loca (Caster Wheel para equilibrio) -->
+  <link name="rueda_loca">
+    <inertial>
+      <mass value="0.2"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+    <collision>
+      <geometry><sphere radius="0.03"/></geometry>
+    </collision>
+    <visual>
+      <geometry><sphere radius="0.03"/></geometry>
+      <material name="negro"/>
+    </visual>
+  </link>
+
+  <!-- Sensor Lidar -->
+  <link name="lidar_link">
+    <inertial>
+      <mass value="0.1"/>
+      <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.0001" iyz="0.0" izz="0.0001"/>
+    </inertial>
+    <collision>
+      <geometry><cylinder radius="0.04" length="0.04"/></geometry>
+    </collision>
+    <visual>
+      <geometry><cylinder radius="0.04" length="0.04"/></geometry>
+      <material name="rojo"/>
+    </visual>
+  </link>
+
+  <!-- ========================================== -->
+  <!--               ARTICULACIONES               -->
+  <!-- ========================================== -->
+  
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0.06"/>
+  </joint>
+
+  <joint name="joint_rueda_izquierda" type="continuous">
+    <parent link="base_link"/>
+    <child link="rueda_izquierda"/>
+    <origin xyz="0 0.18 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <joint name="joint_rueda_derecha" type="continuous">
+    <parent link="base_link"/>
+    <child link="rueda_derecha"/>
+    <origin xyz="0 -0.18 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <joint name="joint_rueda_loca" type="fixed">
+    <parent link="base_link"/>
+    <child link="rueda_loca"/>
+    <origin xyz="0.14 0 -0.03"/>
+  </joint>
+
+  <joint name="joint_lidar" type="fixed">
+    <parent link="base_link"/>
+    <child link="lidar_link"/>
+    <origin xyz="0 0 0.22"/>
+  </joint>
+
+  <!-- ========================================== -->
+  <!--       PLUGINS PARA MODERN GAZEBO           -->
+  <!-- ========================================== -->
+
+  <!-- Plugin de Movimiento Diferencial Moderno -->
+  <gazebo>
+    <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+      <left_joint>joint_rueda_izquierda</left_joint>
+      <right_joint>joint_rueda_derecha</right_joint>
+      <wheel_separation>0.36</wheel_separation>
+      <wheel_diameter>0.12</wheel_diameter>
+      <topic>/cmd_vel</topic>
+      <odom_topic>/odom</odom_topic>
+      
+      <!-- DESCONEXIÓN TOTAL DE TFs EN GAZEBO: Evita que compita con tu script y cause saltos -->
+      <frame_id>odom</frame_id>
+      <child_frame_id>base_footprint</child_frame_id>
+      <publish_odom>true</publish_odom>
+      <publish_odom_tf>false</publish_odom_tf>
+      <publish_wheel_tf>false</publish_wheel_tf>
+      <publish_wheel_joint_state>true</publish_wheel_joint_state>
+    </plugin>
+  </gazebo>
+
+  <!-- Plugin del Sensor LIDAR Moderno -->
+  <gazebo reference="lidar_link">
+    <sensor name="sensor_laser" type="lidar">
+      <pose>0 0 0 0 0 0</pose>
+      <always_on>true</always_on>
+      <update_rate>10.0</update_rate>
+      <visualize>true</visualize>
+      <topic>/scan</topic>
+      
+      <!-- Sincronización absoluta de nombres de eslabones para RViz2 -->
+      <gz_frame_id>lidar_link</gz_frame_id>
+      <ign_frame_id>lidar_link</ign_frame_id>
+      
+      <ray>
+        <scan>
+          <horizontal>
+            <!-- Reducción estratégica a 72 muestras para eliminar el lag gráfico en UTM -->
+            <samples>72</samples>
+            <resolution>1</resolution>
+            <min_angle>-3.14159</min_angle>
+            <max_angle>3.14159</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.15</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+      </ray>
+    </sensor>
+  </gazebo>
+
+</robot>

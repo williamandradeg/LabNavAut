@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+<sdf version="1.8">
+  <world name="ue_nav_aut_world">
+    <!-- Física optimizada a 100Hz para eliminar saltos temporales en UTM (Mac M3) -->
+    <physics name="10ms" type="ignored">
+      <max_step_size>0.01</max_step_size>
+      <real_time_factor>1.0</real_time_factor>
+    </physics>
+    <plugin filename="gz-sim-physics-system" name="gz::sim::systems::Physics"/>
+    <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors"><render_engine>ogre</render_engine></plugin>
+    <plugin filename="gz-sim-user-commands-system" name="gz::sim::systems::UserCommands"/>
+    <plugin filename="gz-sim-scene-broadcaster-system" name="gz::sim::systems::SceneBroadcaster"/>
+
+    <model name="ground_plane">
+      <static>true</static>
+      <link name="link">
+        <collision name="collision"><geometry><plane><normal>0 0 1</normal><size>100 100</size></plane></geometry></collision>
+      </link>
+    </model>
+
+    <!-- 5 OBSTÁCULOS: CANAL CENTRAL TOTALMENTE LIBRE -->
+    <model name="obs1"><static>true</static><pose>1.5 2.0 0.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><cylinder><radius>0.4</radius><length>1.0</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.4</radius><length>1.0</length></cylinder></geometry></visual></link>
+    </model>
+    <model name="obs2"><static>true</static><pose>-1.5 2.0 0.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>0.8 0.8 1.0</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.8 0.8 1.0</size></box></geometry></visual></link>
+    </model>
+    <!-- Obstáculo 3 (Verde): Desplazado a la derecha fuera del camino del robot -->
+    <model name="obs3"><static>true</static><pose>1.8 0.0 0.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><cylinder><radius>0.3</radius><length>1.0</length></cylinder></geometry></collision>
+      <visual name="v"><geometry><cylinder><radius>0.3</radius><length>1.0</length></cylinder></geometry></visual></link>
+    </model>
+    <model name="obs4"><static>true</static><pose>-1.5 -1.5 0.5 0 0 0.785</pose>
+      <link name="l"><collision name="c"><geometry><box><size>1.2 0.3 1.0</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>1.2 0.3 1.0</size></box></geometry></visual></link>
+    </model>
+    <model name="obs5"><static>true</static><pose>1.5 -1.5 0.5 0 0 0</pose>
+      <link name="l"><collision name="c"><geometry><box><size>0.5 0.5 1.0</size></box></geometry></collision>
+      <visual name="v"><geometry><box><size>0.5 0.5 1.0</size></box></geometry></visual></link>
+    </model>
+  </world>
+</sdf>
